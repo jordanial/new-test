@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Networking Fundamentals Lab 3</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-black.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.3.0/css/font-awesome.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body>
+
+<!-- Header -->
+<header class="w3-container w3-theme w3-padding" id="myHeader">
+<!--   <i onclick="w3_open()" class="fa fa-bars w3-xlarge w3-button w3-theme"></i>  -->
+  <div class="w3-center">
+  <h4>Networking Fundamentals 2023</h4>
+  <h1 class="w3-xxxlarge w3-animate-bottom">Lab 7 Jordani Alpuche, Amilcar Vasquez</h1>
+     <p id="ip"></p>
+  </div>
+</header>
+
+<!-- Modal -->
+
+
+<div class="w3-row-padding w3-center w3-margin-top">
+<div class="w3-third w3-teal w3-border">
+  <div class="w3-card w3-container" style="min-height:460px">
+  <h3>Vehicle Mileage</h3><br>
+  <i class="fa fa-desktop w3-margin-bottom w3-text-theme" style="font-size:120px"></i>
+    <hr>
+  <label for="model">Enter Vehicle Model: </label><br>
+ <input type="vmodel" name="model" id="model"> <button id="getMileage">Submit</button>
+ <p id="vm_make">Make: </p>
+  <p id="vm_mpg">City MPG: </p>
+  <p id="vm_class">Class: </p>
+  <p id="vm_cylinders">Cylinders: </p>
+  <p id="vm_liters">Liters: </p>
+ 
+  </div>
+</div>
+
+<div class="w3-third">
+  <div class="w3-card w3-container w3-blue-grey" style="min-height:460px">
+  <h3>Weather</h3><br>
+  <i class="fa fa-css3 w3-margin-bottom w3-text-theme" style="font-size:120px"></i>
+  <hr>
+  <label for="city">Enter City</label><br>
+  <input type="text" name="city" id="city"><button id="getWeather">Submit</button>
+  <p id="w_degrees">Degrees: </p>
+  <p id="w_feel">Feel Like: </p>
+  <p id="w_humidity">Humidity: </p>
+  <p id="w_rise">Sunrise: </p>
+  <p id="w_set">Sunset: </p>
+  
+  </div>
+</div>
+
+<div class="w3-third">
+  <div class="w3-card w3-container w3-blue" style="min-height:460px">
+  <h3>Dad Jokes</h3><br>
+  <i class="fa fa-diamond w3-margin-bottom w3-text-theme" style="font-size:120px"></i>
+  <hr>
+  <label for="">Click to get a joke</label><br><br>
+  <button id="getJokes">Submit</button>
+  <p id="jokes"></p>
+  
+  </div>
+</div>
+</div>
+
+<hr>
+
+
+<!-- Script for Sidebar, Tabs, Accordions, Progress bars and slideshows -->
+<script>
+    async function getPublicIp(){
+        const ip = await fetch("https://api.ipify.org?format=json");  
+         const publicip = await ip.json();        
+         document.getElementById('ip').append('Your public ip is: '+publicip['ip']);
+    }
+    getPublicIp()
+
+
+////////////////vehicle mileage////////////////////
+let vmBtn = document.getElementById('getMileage');
+vmBtn.addEventListener('click', function(){
+
+    var vmTextbox = document.getElementById('model').value; 
+    $.ajax({
+        method: 'GET',
+        url: 'https://api.api-ninjas.com/v1/cars?model=' + vmTextbox,
+        headers: { 'X-Api-Key': 'tMB5q9x3qhW1cxk5mVkBXA==iflYI0RYsW1Nb11k'},
+        contentType: 'application/json',
+        success: function(result) {
+            document.getElementById('vm_make').append(result[0]['make']);
+            document.getElementById('vm_mpg').append(result[0]['city_mpg']);
+            document.getElementById("vm_class").append(result[0]['class']);
+            document.getElementById("vm_cylinders").append(result[0]['cylinders']);
+            document.getElementById("vm_liters").append(result[0]['displacement']);
+           
+            //  console.log(result);
+        },
+        error: function ajaxError(jqXHR) {
+            console.error('Error: ', jqXHR.responseText);
+        }
+    });
+})
+                                   
+/////////////////////weather ///////////////////////
+
+
+let w_btn=document.getElementById('getWeather');
+
+w_btn.addEventListener('click',function(){
+    var city = document.getElementById('city').value;
+
+    function timestampToDate(timestamp){
+        let date = new Date(timestamp * 1000).toLocaleString('en-US', { hour: 'numeric', hour12: true });
+        // console.log(date)
+        return date;
+    }   
+
+$.ajax({
+    method: 'GET',
+    url: 'https://api.api-ninjas.com/v1/weather?city=' + city,
+    headers: { 'X-Api-Key': 'tMB5q9x3qhW1cxk5mVkBXA==iflYI0RYsW1Nb11k'},
+    contentType: 'application/json',
+    success: function(result) {
+      
+        document.getElementById("w_degrees").append((((result['temp'] * 9)/5)+32))
+        document.getElementById("w_feel").append((((result["feels_like"] * 9)/5)+32))
+        document.getElementById("w_humidity").append(result["humidity"])
+        document.getElementById("w_rise").append(timestampToDate(result["sunrise"]))
+        document.getElementById("w_set").append(timestampToDate(result["sunset"]))  
+
+        // console.log(result);
+    },
+    error: function ajaxError(jqXHR) {
+        console.error('Error: ', jqXHR.responseText);
+    }
+});
+
+})
+
+////////////////////////dad jokes /////////////////////
+
+
+let jkBtn = document.getElementById('getJokes');
+
+jkBtn.addEventListener('click',function(){
+    var limit = 1
+$.ajax({
+    method: 'GET',
+    url: 'https://api.api-ninjas.com/v1/dadjokes?limit=' + limit,
+    headers: { 'X-Api-Key': 'tMB5q9x3qhW1cxk5mVkBXA==iflYI0RYsW1Nb11k'},
+    contentType: 'application/json',
+    success: function(result) {
+        document.getElementById('jokes').innerHTML = result[0]['joke'] + ' Badum tss ..';
+        console.log(result);
+    },
+    error: function ajaxError(jqXHR) {
+        console.error('Error: ', jqXHR.responseText);
+    }
+});
+
+})
+
+</script>
+
+</body>
+</html>
